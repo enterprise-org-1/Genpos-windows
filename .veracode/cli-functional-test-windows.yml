@@ -1,0 +1,47 @@
+name: Genpos
+testcases:
+- name: Verify pack command successful and check the total number of artifacts generated
+  steps:
+  # Add environment variable here
+  - script: |
+      cd ..
+      $env:SRCCLR_MSVC_PREPROCESS = "true"
+      {{.script-path}}veracode package --source . --type directory --output .veracode\output\auto --trust
+    assertions:
+      - result.code ShouldEqual 0
+      - result.timeseconds ShouldBeLessThan 1800
+      - result.systemout ShouldContainSubstring ".veracode\output\auto\veracode-auto-pack-WS_AllSource-msvc.zip"
+      - result.systemout ShouldContainSubstring ".veracode\output\auto\veracode-auto-pack-allPepPCIF-msvc.zip"
+      - result.systemout ShouldContainSubstring ".veracode\output\auto\veracode-auto-pack-genpos-js-no-pm.zip"
+      - result.systemout ShouldContainSubstring "Successfully created 3 artifact(s)."
+      # - result.systemout ShouldContainSubstring "Created Windows C/C++ artifacts for WinCppPackager project."
+
+  - type: check-zip-count-windows
+    zip-file: "veracode-auto-pack-WS_AllSource-msvc.zip"
+    assertions:
+      - result.zip-file.count ShouldEqualTrimSpace 1189
+
+  - type: check-zip-contents-windows
+    zip-file: "veracode-auto-pack-WS_AllSource-msvc.zip"
+    assertions:
+      - result.zip-file.difference ShouldBeEmpty
+
+  - type: check-zip-count-windows
+    zip-file: "veracode-auto-pack-allPepPCIF-msvc.zip"
+    assertions:
+      - result.zip-file.count ShouldEqualTrimSpace 443
+
+  - type: check-zip-contents-windows
+    zip-file: "veracode-auto-pack-allPepPCIF-msvc.zip"
+    assertions:
+      - result.zip-file.difference ShouldBeEmpty
+
+  - type: check-zip-count-windows
+    zip-file: "veracode-auto-pack-genpos-js-no-pm.zip"
+    assertions:
+      - result.zip-file.count ShouldEqualTrimSpace 8
+
+  - type: check-zip-contents-windows
+    zip-file: "veracode-auto-pack-genpos-js-no-pm.zip"
+    assertions:
+      - result.zip-file.difference ShouldBeEmpty
